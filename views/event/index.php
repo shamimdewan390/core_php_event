@@ -29,6 +29,37 @@ $events = $eventObj->pagination('*', 'events', $limit, $offset);
 $totalRowCount = $eventObj->index("*", "events")->num_rows;
 $totalPage = ceil($totalRowCount / $limit);
 ?>
+
+<style>
+    .text-center{
+        float: right;
+    }
+    .pagination {
+        display: inline-block;
+        float: right;
+    }
+
+    .pagination a {
+        color: black;
+        float: left;
+        padding: 8px 16px;
+        text-decoration: none;
+    }
+
+    .pagination a.active {
+        background-color: lightsalmon;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .pagination a:hover:not(.active) {
+        background-color: #ddd;
+        border-radius: 5px;
+    }
+    a.btn.btn-primary.float-right.col-2{
+        float: right;
+    }
+</style>
 <div class="row">
     <div class="col-md-12 m-auto">
         <div class="card-body">
@@ -60,7 +91,8 @@ $totalPage = ceil($totalRowCount / $limit);
                                     <td><?= $event['capacity'] ?> </td>
                                     <td>
                                         <a href="<?php echo $base_url. 'views/event/edit.php/?id=' . $event['id'] ?>" class="btn btn-primary">Edit</a>
-                                        <a href="<?php echo $base_url . $event['id'] ?>" onclick=" return confirm('Are you sure?')" class="btn btn-danger">Delete</a>
+
+                                        <a href="<?php echo $base_url. 'views/event/delete.php/?id=' . $event['id'] ?>" onclick=" return confirm('Are you sure?')" class="btn btn-danger">Delete</a>
                                         <button type="button" onclick="myfunc(this)" value="<?= $book['id'] ?>" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                             Details
                                         </button>
@@ -69,6 +101,19 @@ $totalPage = ceil($totalRowCount / $limit);
                             <?php } ?>
                         </tbody>
                     </table>
+                    <div class="float-right">
+    <div class="pagination">
+        <a href="#">&laquo;</a>
+
+        <?php $i = 1;
+        while ($i <= $totalPage) { ?>
+            <a href="<?= $_SERVER["PHP_SELF"] . '?page=' . $i . '&limit=' . $limit ?>" class="<?= ($page == $i) ? 'active' : '' ?>"><?= $i ?></a>
+    <?php $i++;
+} ?>
+        <a href="#">&raquo;</a>
+    </div>
+
+</div>
                 </div>
             </div>
         </div>

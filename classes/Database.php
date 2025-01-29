@@ -57,7 +57,7 @@ class Database {
 
         $where = $this->checkWhere($where);
         $sql = "DELETE FROM {$table} {$where}";
-        echo $sql;exit;
+        // echo $sql;exit;
         $result = $this->conn->query($sql);
         if ($result) {
             return $result;
