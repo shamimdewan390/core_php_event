@@ -27,7 +27,7 @@ class Auth {
     
     // Register new User
     public function registerUser($data) {
-        
+
         $table = $this->table;
         $result = $this->mysql->insert($table, $data);
         if($result){

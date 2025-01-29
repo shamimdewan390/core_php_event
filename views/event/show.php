@@ -1,5 +1,24 @@
 <?php
 require '../layout/header.php';
+require_once '../../classes/Attendee.php';
+require_once '../../classes/Event.php';
+
+
+
+$id = $_GET['id'];
+
+
+$objAttendee = new Attendee();
+$objEvent = new Event();
+$columns = "events.id AS event_id, events.name AS event_name, attendees.id AS attendee_id, attendees.name AS attendee_name, attendees.phone";
+$maintable = "events";
+$jointype = ['INNER JOIN'];
+$joinTables = ['attendees'];
+$joinConditions = ['events.id = attendees.event_id'];
+$where = ['event_id' => $id];
+$event = $objEvent->join($columns, $maintable, $jointype, $joinTables, $joinConditions, $where);
+$currentEventId = null;
+
 ?>
 
 <div class="row">
@@ -7,29 +26,28 @@ require '../layout/header.php';
         <div class="card-body">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3>Event List</h3>
-                    <a href="create.php" class="btn btn-primary">+ Add New</a>
+                    <h3>Attendee List: </h3>
+                    <?php
+
+                    ?>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th scope="col">Title</th>
-                                <td>new event</td>
-                            </tr>
-                            <tr>
-                                <th scope="col">Description</th>
-                                <td>Description Description</td>
-                            </tr>
-                            <tr>
-                                <th scope="col">Capacity</th>
-                                <td>20</td>
-                            </tr>
-                            <tr>
-                                <th scope="col">Date</th>
-                                <td>20/01/25</td>
+                                <th scope="col">Name</th>
+                                <th scope="col">Phone</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            <?php
+                            while ($eventRow = $event->fetch_assoc()) { ?>
+                                <tr>
+                                    <td><?= $eventRow['attendee_name'] ?> </td>
+                                    <td><?= $eventRow['phone'] ?> </td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
                     </table>
                 </div>
             </div>

@@ -32,7 +32,7 @@ require_once __DIR__ . '/../../config.php';
                 <ul class="navbar-nav mr-auto">
                     <?php if (isset($_SESSION['user_id'])): ?>
                     <li class="nav-item active">
-                        <a class="nav-link" href="/views/event/index.php">Add Event</span></a>
+                        <a class="nav-link" href="/views/event/index.php">Event List</span></a>
                     </li>
                     <?php endif; ?>
                 </ul>

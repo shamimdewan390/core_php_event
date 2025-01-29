@@ -13,6 +13,14 @@ class Database {
         $this->conn = new mysqli($this->host, $this->user, $this->password, $this->dbName);
     }
 
+    public function countRows($colmns, $table, $where = ["key" => "value"]) {
+        $where = $this->checkWhere($where);
+        $sql = "SELECT COUNT($colmns) AS total FROM {$table} {$where}";
+        $result = $this->conn->query($sql);
+        $row = $result->fetch_assoc();
+        return $row['total'];
+    }
+
     // Select Function 
     public function select($colmns = ['columnName1', 'columnName2'], $table, $where = ["key" => 'value']) {
 
@@ -27,16 +35,43 @@ class Database {
     // Insert Function
     public function insert($table, $data = ["colName" => "value"]) {
 
-        $sql = "INSERT INTO {$table} {$this->formatData($data)} ";
-      
-        $result = $this->conn->query($sql);
-
-        if ($this->conn->affected_rows == 1) {
-            return $result;
+        $formattedData = $this->formatData($data);
+        
+        if (!$formattedData) {
+            return "Invalid data format!";
+        }
+    
+        $sql = "INSERT INTO {$table} {$formattedData}";
+    
+        $stmt = $this->conn->prepare($sql);
+        
+        if (!$stmt) {
+            return "Error in SQL preparation: " . $this->conn->error;
+        }
+    
+        $types = str_repeat('s', count($data)); // Assuming all values are strings
+        $values = array_values($data);
+        
+        $stmt->bind_param($types, ...$values);
+        
+        if ($stmt->execute()) {
+            return true; // Success
         } else {
-            return $this->conn->error;
+            return "Error: " . $stmt->error;
         }
     }
+    // public function insert($table, $data = ["colName" => "value"]) {
+
+    //     $sql = "INSERT INTO {$table} {$this->formatData($data)} ";
+      
+    //     $result = $this->conn->query($sql);
+
+    //     if ($this->conn->affected_rows == 1) {
+    //         return $result;
+    //     } else {
+    //         return $this->conn->error;
+    //     }
+    // }
 
     //Update Function
     public function update($table, $updateArr = [], $where = ["key" => 'value']) {
@@ -69,7 +104,7 @@ class Database {
     // Paginate Function
     public function pagination($colmns,$table,$limit,$offset) {
         $colmn = $this->getCol($colmns);
-        $sql = "SELECT {$colmn} FROM {$table} LIMIT {$limit} OFFSET {$offset}";
+        $sql = "SELECT {$colmn} FROM {$table} ORDER BY id DESC LIMIT {$limit} OFFSET {$offset}";
 //        echo $sql;exit;
         $result = $this->conn->query($sql);
         return $result;
@@ -176,26 +211,39 @@ class Database {
     // this will format inserted data from $_POST
     private function formatData($data) {
         if (!empty($data) && $data !== ["colName" => "value"]) {
-            $columnName = array_keys($data);
-            $columnValue = array_values($data);
-            $colName = '';
-            $colValue = '';
-            foreach ($columnName as $key => $value) {
-                if ($key == count($columnName) - 1) {
-                    $colName .= " {$value} ";
-                    $colValue .= " '$columnValue[$key]' ";
-                } else {
-                    $colName .= " {$value}, ";
-                    $colValue .=  " '$columnValue[$key]', ";
-                }
-            }
-            $string = "( {$colName} ) VALUES ( {$colValue} )";
-
-            return $string;
+            $columnNames = array_keys($data);
+            $placeholders = array_fill(0, count($data), '?');
+    
+            $colName = implode(", ", $columnNames);
+            $colValue = implode(", ", $placeholders);
+    
+            return "( {$colName} ) VALUES ( {$colValue} )";
         } else {
             return '';
         }
     }
+    // private function formatData($data) {
+    //     if (!empty($data) && $data !== ["colName" => "value"]) {
+    //         $columnName = array_keys($data);
+    //         $columnValue = array_values($data);
+    //         $colName = '';
+    //         $colValue = '';
+    //         foreach ($columnName as $key => $value) {
+    //             if ($key == count($columnName) - 1) {
+    //                 $colName .= " {$value} ";
+    //                 $colValue .= " '$columnValue[$key]' ";
+    //             } else {
+    //                 $colName .= " {$value}, ";
+    //                 $colValue .=  " '$columnValue[$key]', ";
+    //             }
+    //         }
+    //         $string = "( {$colName} ) VALUES ( {$colValue} )";
+
+    //         return $string;
+    //     } else {
+    //         return '';
+    //     }
+    // }
     
     
 

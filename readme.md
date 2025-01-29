@@ -52,3 +52,22 @@ project/
         } else {
             echo "Error creating table: " . $this->conn->error;
         } -->
+
+
+
+
+
+        <!-- $sql = "CREATE TABLE attendees (
+            id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            event_id INT(11) UNSIGNED NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            phone VARCHAR(20) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+        )";
+        
+        if ($this->conn->query($sql) === TRUE) {
+            echo "Table attendees created successfully";
+        } else {
+            echo "Error creating table: " . $this->conn->error;
+        } -->
