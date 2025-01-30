@@ -102,9 +102,11 @@ class Database {
     }
 
     // Paginate Function
-    public function pagination($colmns,$table,$limit,$offset) {
+    public function pagination($colmns,$table,$limit,$offset, $sortColumn = '', $sortOrder = '') {
+
+        // print_r($sortOrder);
         $colmn = $this->getCol($colmns);
-        $sql = "SELECT {$colmn} FROM {$table} ORDER BY id DESC LIMIT {$limit} OFFSET {$offset}";
+        $sql = "SELECT {$colmn} FROM {$table} WHERE capacity BETWEEN 6 AND 100 ORDER BY $sortColumn $sortOrder LIMIT {$limit} OFFSET {$offset}";
 //        echo $sql;exit;
         $result = $this->conn->query($sql);
         return $result;

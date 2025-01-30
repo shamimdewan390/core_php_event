@@ -8,25 +8,26 @@ require_once 'config.php';
 session_start();
 
 if (empty($_GET['page'])) {
-$page = 1;
+    $page = 1;
 } else {
-$page = $_GET['page'];
+    $page = $_GET['page'];
 }
 if (empty($_POST['limit']) && empty($_GET['limit'])) {
-$limit = 5;
+    $limit = 5;
 } elseif (isset($_POST['limit'])) {
-$limit = $_POST['limit'];
+    $limit = $_POST['limit'];
 } else {
-$limit = $_GET['limit'];
+    $limit = $_GET['limit'];
 }
-//exit;
-//echo $limit;exit;
+$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'name';
+$sortOrder = isset($_GET['order']) ? $_GET['order'] : 'asc';
+$nextSortOrder = ($sortOrder === 'asc') ? 'desc' : 'asc';
 
 $limit = (int) $limit;
 $offset = ($page - 1) * $limit;
-// echo $limit;exit;
+
 $eventObj = new Event();
-$events = $eventObj->pagination('*', 'events', $limit, $offset);
+$events = $eventObj->pagination('*', 'events', $limit, $offset, $sortColumn, $nextSortOrder);
 
 $totalRowCount = $eventObj->index("*", "events")->num_rows;
 $totalPage = ceil($totalRowCount / $limit);
@@ -76,11 +77,27 @@ $totalPage = ceil($totalRowCount / $limit);
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                             <tr>
-                                <!-- <th scope="col">#</th> -->
-                                <th scope="col">Name</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Capacity</th>
+                                <th scope="col">
+                                    <a href="?sort=name&order=<?= $nextSortOrder ?>">
+                                        Name <?= ($sortColumn === 'name' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
+                                    </a>
+                                </th>
+                                <th scope="col">
+                                    <a href="?sort=description&order=<?= $nextSortOrder ?>">
+                                        Description <?= ($sortColumn === 'description' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
+                                    </a>
+                                </th>
+                                <th scope="col">
+                                    <a href="?sort=date&order=<?= $nextSortOrder ?>">
+                                        Date <?= ($sortColumn === 'date' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
+                                    </a>
+                                </th>
+                                <th scope="col">
+                                    <a href="?sort=capacity&order=<?= $nextSortOrder ?>">
+                                        Capacity <?= ($sortColumn === 'capacity' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
+                                    </a>
+                                </th>
+
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -95,7 +112,7 @@ $totalPage = ceil($totalRowCount / $limit);
                                     <td><?= $event['capacity'] ?> </td>
                                     <td>
                                         <a href="<?php echo $base_url . 'views/attendee/create.php/?id=' . $event['id'] ?>" class="btn btn-info">Apply</a>
-                                        
+
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -123,23 +140,23 @@ $totalPage = ceil($totalRowCount / $limit);
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <?php
