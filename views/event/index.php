@@ -5,8 +5,11 @@ require_once __DIR__ . '/../../config.php';
 
 session_start();
 
-$user_id = $_SESSION['user_id']; 
+$user_id = $_SESSION['user_id'];
 
+if(!$user_id){
+    header("Location: " . $base_url . "index.php");
+}
 
 if (isset($_GET['search'])) {
     $search = !empty($_GET['search']) ? trim($_GET['search']) : null;
@@ -25,7 +28,7 @@ if (empty($_GET['page'])) {
     $page = $_GET['page'];
 }
 if (empty($_POST['limit']) && empty($_GET['limit'])) {
-    $limit = 5;
+    $limit = 10;
 } elseif (isset($_POST['limit'])) {
     $limit = $_POST['limit'];
 } else {
@@ -42,9 +45,9 @@ $offset = ($page - 1) * $limit;
 
 
 $eventObj = new Event();
-$events = $eventObj->pagination('*', 'events', $limit, $offset,$user_id, $sortColumn, $nextSortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
+$events = $eventObj->pagination('*', 'events', $limit, $offset, $user_id, $sortColumn, $nextSortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
 
-$totalRowCount = $eventObj->index("*", "events")->num_rows;
+$totalRowCount = $eventObj->index("*", "events", ["user_id" => $user_id])->num_rows;
 $totalPage = ceil($totalRowCount / $limit);
 ?>
 
@@ -92,16 +95,34 @@ $totalPage = ceil($totalRowCount / $limit);
                     <a href="<?php echo $base_url . '/views/event/create.php' ?>" class="btn btn-primary">+ Add New</a>
                 </div>
                 <div class="card-body">
-                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get">
-                        <input name="search" type="text" placeholder="Search by Name">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </form>
-                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get">
-                        <input name="min_capacity" type="text" placeholder="Min Capacity">
-                        <input name="max_capacity" type="text" placeholder="Max Capacity">
-                        <button type="submit" class="btn btn-primary">Filter</button>
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get" class="form-inline">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input input name="search" type="text" placeholder="Search by Name" class="form-control">
+
+                            </div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
                     </form>
 
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get" class="form-inline">
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" name="min_capacity"  class="form-control" placeholder="Min Capacity">
+                            </div>
+                            <div class="col">
+                                <input type="text" name="max_capacity" class="form-control" placeholder="Max Capacity">
+                            </div>
+                            <div class="col">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                            <div class="col">
+                            <button type="submit" class="btn btn-primary">clear</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered table-hover">
@@ -133,6 +154,7 @@ $totalPage = ceil($totalRowCount / $limit);
                         </thead>
                         <tbody>
                             <?php foreach ($events as $event) { ?>
+                                
                                 <tr>
                                     <td><?= $event['name'] ?></td>
                                     <td><?= $event['description'] ?></td>

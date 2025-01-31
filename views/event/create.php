@@ -3,6 +3,14 @@ require '../layout/header.php';
 require_once '../../classes/Event.php';
 
 
+session_start();
+
+$user_id = $_SESSION['user_id'];
+
+if(!$user_id){
+    header("Location: " . $base_url . "index.php");
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $post = $_POST; // Get all form data
     $post['user_id'] = $_SESSION['user_id']; // Add user_id

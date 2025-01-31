@@ -3,6 +3,11 @@ require '../layout/header.php';
 require_once '../../classes/Event.php';
 require_once __DIR__ . '/../../config.php';
 
+$user_id = $_SESSION['user_id'];
+
+if(!$user_id){
+    header("Location: " . $base_url . "index.php");
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];

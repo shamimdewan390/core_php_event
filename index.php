@@ -9,10 +9,9 @@ session_start();
 
 if (isset($_GET['search'])) {
     $search = !empty($_GET['search']) ? trim($_GET['search']) : null;
-    $searchColumn = 'name'; // Define which column to search in
+    $searchColumn = 'name';
 }
 
-// Handle filter form
 if (isset($_GET['min_capacity']) || isset($_GET['max_capacity'])) {
     $min_capacity = !empty($_GET['min_capacity']) ? trim($_GET['min_capacity']) : null;
     $max_capacity = !empty($_GET['max_capacity']) ? trim($_GET['max_capacity']) : null;
@@ -24,7 +23,7 @@ if (empty($_GET['page'])) {
     $page = $_GET['page'];
 }
 if (empty($_POST['limit']) && empty($_GET['limit'])) {
-    $limit = 5;
+    $limit = 6;
 } elseif (isset($_POST['limit'])) {
     $limit = $_POST['limit'];
 } else {
@@ -41,7 +40,7 @@ $offset = ($page - 1) * $limit;
 
 
 $eventObj = new Event();
-$events = $eventObj->pagination('*', 'events', $limit, $offset,$user_id, $sortColumn, $nextSortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
+$events = $eventObj->pagination('*', 'events', $limit, $offset, $user_id, $sortColumn, $nextSortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
 
 $totalRowCount = $eventObj->index("*", "events")->num_rows;
 $totalPage = ceil($totalRowCount / $limit);
@@ -85,53 +84,60 @@ $totalPage = ceil($totalRowCount / $limit);
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Event List</h3>
-                    <a href="<?php echo $base_url . '/views/event/create.php' ?>" class="btn btn-primary">+ Add New</a>
+                </div>
+
+                <div class="card-body">
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get" class="form-inline">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input input name="search" type="text" placeholder="Search by Name" class="form-control">
+
+                            </div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get" class="form-inline">
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" name="min_capacity"  class="form-control" placeholder="Min Capacity">
+                            </div>
+                            <div class="col">
+                                <input type="text" name="max_capacity" class="form-control" placeholder="Max Capacity">
+                            </div>
+                            <div class="col">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                            <div class="col">
+                            <button type="submit" class="btn btn-primary">clear</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    <a href="?sort=name&order=<?= $nextSortOrder ?>">
-                                        Name <?= ($sortColumn === 'name' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
-                                    </a>
-                                </th>
-                                <th scope="col">
-                                    <a href="?sort=description&order=<?= $nextSortOrder ?>">
-                                        Description <?= ($sortColumn === 'description' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
-                                    </a>
-                                </th>
-                                <th scope="col">
-                                    <a href="?sort=date&order=<?= $nextSortOrder ?>">
-                                        Date <?= ($sortColumn === 'date' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
-                                    </a>
-                                </th>
-                                <th scope="col">
-                                    <a href="?sort=capacity&order=<?= $nextSortOrder ?>">
-                                        Capacity <?= ($sortColumn === 'capacity' && $sortOrder === 'asc') ? '⬆️' : '⬇️' ?>
-                                    </a>
-                                </th>
 
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $count = 1;
-                            foreach ($events as $key => $event) { ?>
-                                <tr>
-                                    <!-- <th><?= $event['id'] ?></th> -->
-                                    <td><?= $event['name'] ?> </td>
-                                    <td><?= $event['description'] ?> </td>
-                                    <td><?= $event['date'] ?> </td>
-                                    <td><?= $event['capacity'] ?> </td>
-                                    <td>
+
+                    <div class="row">
+                        <?php $count = 1;
+                        foreach ($events as $key => $event) { ?>
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?= $event['name'] ?></h5>
+                                        <p class="card-text"><?= $event['description'] ?> </p>
+                                        <p class="card-text">Capacity: <?= $event['capacity'] ?> </p>
+                                        <p class="card-text">Date: <?= date('d-m-Y', strtotime($event['date'])) ?> </p>
                                         <a href="<?php echo $base_url . 'views/attendee/create.php/?id=' . $event['id'] ?>" class="btn btn-info">Apply</a>
 
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="card-footer">
                     <div class="float-right">
                         <div class="pagination">
                             <a href="#">&laquo;</a>

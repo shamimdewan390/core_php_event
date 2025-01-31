@@ -3,11 +3,15 @@ require '../layout/header.php';
 require_once '../../classes/Attendee.php';
 require_once '../../classes/Event.php';
 
+session_start();
 
+$user_id = $_SESSION['user_id'];
+
+if(!$user_id){
+    header("Location: " . $base_url . "index.php");
+}
 
 $id = $_GET['id'];
-
-
 $objAttendee = new Attendee();
 $objEvent = new Event();
 $columns = "events.id AS event_id, events.name AS event_name, attendees.id AS attendee_id, attendees.name AS attendee_name, attendees.phone";

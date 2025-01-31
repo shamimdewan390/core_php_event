@@ -12,8 +12,9 @@ class Event {
         $this->conn = new Database();
     }
 
-    public function index($col, $table) {
-        $result = $this->conn->select($col, $table);
+    public function index($col, $table, $user_id = null) {
+      
+        $result = $this->conn->select($col, $table, $user_id);
         return $result;
     }
 

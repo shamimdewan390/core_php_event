@@ -24,6 +24,7 @@ class Database {
     // Select Function 
     public function select($colmns = ['columnName1', 'columnName2'], $table, $where = ["key" => 'value']) {
 
+        // var_dump($where);
         $colmns = $this->getCol($colmns);
         $where = $this->checkWhere($where);
         $sql = "SELECT {$colmns} FROM {$table} {$where}";
