@@ -3,26 +3,34 @@ session_start();
 require_once './layout/header.php';
 require_once '../classes/Auth.php';
 
+// Display success message
 if (isset($_SESSION['success'])) {
     echo "<div class='alert alert-success'>" . $_SESSION['success'] . "</div>";
-    unset($_SESSION['success']); // Clear the success message after showing it
+    unset($_SESSION['success']);
 }
 
+// Display error message
 if (isset($_SESSION['error'])) {
     echo "<div class='alert alert-danger'>" . $_SESSION['error'] . "</div>";
-    unset($_SESSION['error']); // Clear the error message after showing it
+    unset($_SESSION['error']);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $authObj = new Auth();
-    $user = $authObj->login('*', 'users', ["email" => $_POST["email"]], $_POST['password']);
+    $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+    $password = $_POST['password'];
 
-    if (password_verify($_POST['password'], $user->password)) {
+    $user = $authObj->login('*', 'users', ["email" => $email], $password);
+
+    if ($user && password_verify($password, $user->password)) {
         $_SESSION['user_id'] = $user->id;
         $_SESSION['email'] = $user->email;
         header("location: event/index.php");
+        exit();
     } else {
-        header("location: " . $_SESSION['PHP_SELF']);
+        $_SESSION['error'] = "Invalid email or password.";
+        header("location: login.php");
+        exit();
     }
 }
 ?>
@@ -31,11 +39,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="col-md-8 m-auto">
         <div class="card-body">
             <div class="card">
-                <div class="card-header">
-                    Login
-                </div>
+                <div class="card-header">Login</div>
                 <div class="card-body">
-                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="post" id="loginForm">
+                    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" id="loginForm">
                         <div class="form-group">
                             <label for="email">Email address</label>
                             <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
@@ -63,11 +69,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById("passwordError").textContent = "";
 
         // Get form values
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
+        let email = document.getElementById("email").value.trim();
+        let password = document.getElementById("password").value.trim();
 
         // Email validation
-        if (email.trim() === "") {
+        if (email === "") {
             document.getElementById("emailError").textContent = "Email is required.";
             valid = false;
         } else if (!/\S+@\S+\.\S+/.test(email)) { 
@@ -76,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Password validation
-        if (password.trim() === "") {
+        if (password === "") {
             document.getElementById("passwordError").textContent = "Password is required.";
             valid = false;
         } else if (password.length < 5) { // Password length validation
@@ -90,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     });
 </script>
+
 <?php
 require_once './layout/footer.php';
 ?>

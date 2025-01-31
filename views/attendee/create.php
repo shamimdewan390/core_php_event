@@ -3,23 +3,42 @@ require '../layout/header.php';
 require_once '../../classes/Attendee.php';
 require_once '../../classes/Event.php';
 
+session_start(); // Ensure session is started
+
+$errors = []; // Array to store validation errors
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $post = $_POST;
     $objAttendee = new Attendee();
     $objEvent = new Event();
-    $event = $objEvent->find("*", 'events', ['id' => $post['event_id']]);
-    $capacity = $event['capacity'];
-    $attendeeCount = $objAttendee->countRows('*', 'attendees', ['event_id' => $event['id']]);
 
+    // Validate Name
+    if (empty($post['name'])) {
+        $_SESSION['error'] = "Name is required.";
+    }
 
-    if ($attendeeCount >= $capacity) {
-        $_SESSION['success'] = "Sorry, the event is full. Registration is closed.";
-    } else {
-        $result = $objAttendee->insert("attendees", $post);
+    // Validate Phone
+    if (empty($post['phone'])) {
+        $_SESSION['error'] = "Phone number is required.";
+    } elseif (!preg_match('/^\d{11}$/', $post['phone'])) {
+        $_SESSION['error'] = "Phone number should be 11 digits.";
+    }
 
-        if ($result == "inserted") {
-            header("Location: " . $base_url . "index.php");
+    // Proceed only if there are no validation errors
+    if (empty($_SESSION['error'])) {
+
+        $event = $objEvent->find("*", 'events', ['id' => $post['event_id']]);
+        $capacity = $event['capacity'];
+        $attendeeCount = $objAttendee->countRows('*', 'attendees', ['event_id' => $event['id']]);
+
+        if ($attendeeCount >= $capacity) {
+            $_SESSION['info'] = "Sorry, the event is full. Registration is closed.";
+        } else {
+            $result = $objAttendee->insert("attendees", $post);
+
+            if ($result == "inserted") {
+                header("Location: " . $base_url . "index.php");
+            }
         }
     }
 } else {
@@ -32,9 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="card-body">
             <?php
 
-            if (isset($_SESSION['success'])) {
-                echo "<div class='alert alert-info'>" . $_SESSION['success'] . "</div>";
-                unset($_SESSION['success']);
+            if (isset($_SESSION['info'])) {
+                echo "<div class='alert alert-info'>" . $_SESSION['info'] . "</div>";
+                unset($_SESSION['info']);
+            }
+            if (isset($_SESSION['error'])) {
+                echo "<div class='alert alert-danger'>" . $_SESSION['error'] . "</div>";
+                unset($_SESSION['error']);
             }
 
             ?>

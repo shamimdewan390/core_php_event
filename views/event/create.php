@@ -7,26 +7,63 @@ session_start();
 
 $user_id = $_SESSION['user_id'];
 
-if(!$user_id){
+if (!$user_id) {
     header("Location: " . $base_url . "index.php");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $post = $_POST; // Get all form data
-    $post['user_id'] = $_SESSION['user_id']; // Add user_id
-    
- 
-    $events = new Event();
-    $result = $events->insert("events", $post);
-    if ($result == "inserted") {
-        header("Location: index.php");
+    $post['user_id'] = $user_id; // Add user_id
+
+    // Validate Name
+    if (empty($post['name'])) {
+        $_SESSION['error'] = "Name is required.";
+    }
+
+    // Validate Description
+    if (empty($post['description'])) {
+        $_SESSION['error'] = "Description is required.";
+    }
+
+    // Validate Capacity
+    if (empty($post['capacity'])) {
+        $_SESSION['error'] = "Capacity is required.";
+    } elseif (!is_numeric($post['capacity']) || $post['capacity'] <= 0) {
+        $_SESSION['error'] = "Capacity must be a positive number.";
+    }
+
+    // Validate Date
+    if (empty($post['date'])) {
+        $_SESSION['error'] = "Date is required.";
+    } elseif (strtotime($post['date']) < strtotime(date("Y-m-d"))) {
+        $_SESSION['error'] = "The event date cannot be in the past.";
+    }
+
+    // If there are no errors, insert into the database
+    if (empty($_SESSION['error'])) {
+        $events = new Event();
+        $result = $events->insert("events", $post);
+
+        if ($result == "inserted") {
+            header("Location: index.php");
+            exit();
+        }
     }
 }
 ?>
 
+
 <div class="row">
     <div class="col-md-12 m-auto">
         <div class="card-body">
+            <?php
+
+            if (isset($_SESSION['error'])) {
+                echo "<div class='alert alert-danger'>" . $_SESSION['error'] . "</div>";
+                unset($_SESSION['error']);
+            }
+
+            ?>
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Add Event</h3>
