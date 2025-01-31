@@ -7,6 +7,17 @@ require_once 'config.php';
 
 session_start();
 
+if (isset($_GET['search'])) {
+    $search = !empty($_GET['search']) ? trim($_GET['search']) : null;
+    $searchColumn = 'name'; // Define which column to search in
+}
+
+// Handle filter form
+if (isset($_GET['min_capacity']) || isset($_GET['max_capacity'])) {
+    $min_capacity = !empty($_GET['min_capacity']) ? trim($_GET['min_capacity']) : null;
+    $max_capacity = !empty($_GET['max_capacity']) ? trim($_GET['max_capacity']) : null;
+}
+
 if (empty($_GET['page'])) {
     $page = 1;
 } else {
@@ -19,15 +30,18 @@ if (empty($_POST['limit']) && empty($_GET['limit'])) {
 } else {
     $limit = $_GET['limit'];
 }
-$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'name';
+
+$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'id';
 $sortOrder = isset($_GET['order']) ? $_GET['order'] : 'asc';
 $nextSortOrder = ($sortOrder === 'asc') ? 'desc' : 'asc';
+
 
 $limit = (int) $limit;
 $offset = ($page - 1) * $limit;
 
+
 $eventObj = new Event();
-$events = $eventObj->pagination('*', 'events', $limit, $offset, $sortColumn, $nextSortOrder);
+$events = $eventObj->pagination('*', 'events', $limit, $offset,$user_id, $sortColumn, $nextSortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
 
 $totalRowCount = $eventObj->index("*", "events")->num_rows;
 $totalPage = ceil($totalRowCount / $limit);

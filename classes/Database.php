@@ -3,7 +3,7 @@
 class Database {
 
     private $host = "localhost";
-    private $user = "rootuser";
+    private $user = "localhost_user";
     private $password = "12345678";
     private $dbName = "localhost";
     protected $conn;
@@ -102,15 +102,75 @@ class Database {
     }
 
     // Paginate Function
-    public function pagination($colmns,$table,$limit,$offset, $sortColumn = '', $sortOrder = '') {
-
-        // print_r($sortOrder);
-        $colmn = $this->getCol($colmns);
-        $sql = "SELECT {$colmn} FROM {$table} WHERE capacity BETWEEN 6 AND 100 ORDER BY $sortColumn $sortOrder LIMIT {$limit} OFFSET {$offset}";
-//        echo $sql;exit;
-        $result = $this->conn->query($sql);
-        return $result;
+    public function pagination($columns, $table, $limit, $offset, $user_id = null, $sortColumn = 'id', $sortOrder = 'DESC', $min_capacity = null, $max_capacity = null, $searchColumn = '', $search = '') {
+        $colmn = $this->getCol($columns);
+    
+        // Initialize base query
+        $sql = "SELECT {$colmn} FROM {$table}";
+    
+        // Array to store WHERE conditions
+        $whereClauses = [];
+        $params = [];
+    
+        // Add user_id filter only if provided
+        if (!is_null($user_id)) {
+            $whereClauses[] = "user_id = ?";
+            $params[] = $user_id;
     }
+    
+        // Add capacity filter
+        if (!is_null($min_capacity) && !is_null($max_capacity)) {
+            $whereClauses[] = "capacity BETWEEN ? AND ?";
+            $params[] = $min_capacity;
+            $params[] = $max_capacity;
+        }
+    
+        // Add search filter
+        if (!empty($searchColumn) && !empty($search)) {
+            $whereClauses[] = "{$searchColumn} LIKE ?";
+            $params[] = "%$search%";
+        }
+    
+        // Add WHERE clause if needed
+        if (!empty($whereClauses)) {
+            $sql .= " WHERE " . implode(" AND ", $whereClauses);
+        }
+    
+        // Ensure sorting is applied (default is `id DESC`)
+        $sql .= " ORDER BY {$sortColumn} {$sortOrder}";
+    
+        // Add LIMIT and OFFSET
+        $sql .= " LIMIT ? OFFSET ?";
+        $params[] = (int) $limit;
+        $params[] = (int) $offset;
+    
+        // Prepare statement
+        $stmt = $this->conn->prepare($sql);
+        
+        // Bind parameters dynamically
+        if (!empty($params)) {
+            $stmt->bind_param(str_repeat("s", count($params)), ...$params);
+        }
+    
+        // Execute query
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    
+    
+    
+    
+    
+    // public function pagination($colmns,$table,$limit,$offset, $sortColumn = '', $sortOrder = '') {
+
+    //     $colmn = $this->getCol($colmns);
+    //     $sql = "SELECT {$colmn} FROM {$table} WHERE capacity BETWEEN 1 AND 100 ORDER BY $sortColumn $sortOrder LIMIT {$limit} OFFSET {$offset}";
+        
+    //     $result = $this->conn->query($sql);
+    //     return $result;
+    // }
 
     public function join($colums = '', $maintable = '', $jointype = ['INNER JOIN'], $joinTables = ['other tables'], $joinConditions = ["ON Condition"], $where = '', $limit = '', $offset = '') {
         $where = $this->checkWhere($where);

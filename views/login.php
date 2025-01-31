@@ -79,8 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password.trim() === "") {
             document.getElementById("passwordError").textContent = "Password is required.";
             valid = false;
-        } else if (password.length < 6) { // Password length validation
-            document.getElementById("passwordError").textContent = "Password must be at least 6 characters long.";
+        } else if (password.length < 5) { // Password length validation
+            document.getElementById("passwordError").textContent = "Password must be at least 5 characters long.";
             valid = false;
         }
 

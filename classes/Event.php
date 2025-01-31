@@ -42,8 +42,10 @@ class Event {
         return $result;
     }
 
-    public function pagination($colms, $table, $limit, $offset, $sortColumn='', $sortOrder='') {
-        $result = $this->conn->pagination($colms, $table, $limit, $offset, $sortColumn, $sortOrder);
+    public function pagination($colms, $table, $limit, $offset, $user_id = null, $sortColumn='', $sortOrder='', $min_capacity = null, $max_capacity = null, $searchColumn= null, $search = null) {
+
+   
+        $result = $this->conn->pagination($colms, $table, $limit, $offset,$user_id, $sortColumn, $sortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
         if ($result) {
             return $result;
         } else {

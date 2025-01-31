@@ -4,7 +4,10 @@ require_once '../../classes/Event.php';
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $post = $_POST;
+    $post = $_POST; // Get all form data
+    $post['user_id'] = $_SESSION['user_id']; // Add user_id
+    
+ 
     $events = new Event();
     $result = $events->insert("events", $post);
     if ($result == "inserted") {

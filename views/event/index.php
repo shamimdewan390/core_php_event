@@ -5,6 +5,20 @@ require_once __DIR__ . '/../../config.php';
 
 session_start();
 
+$user_id = $_SESSION['user_id']; 
+
+
+if (isset($_GET['search'])) {
+    $search = !empty($_GET['search']) ? trim($_GET['search']) : null;
+    $searchColumn = 'name'; // Define which column to search in
+}
+
+// Handle filter form
+if (isset($_GET['min_capacity']) || isset($_GET['max_capacity'])) {
+    $min_capacity = !empty($_GET['min_capacity']) ? trim($_GET['min_capacity']) : null;
+    $max_capacity = !empty($_GET['max_capacity']) ? trim($_GET['max_capacity']) : null;
+}
+
 if (empty($_GET['page'])) {
     $page = 1;
 } else {
@@ -18,7 +32,7 @@ if (empty($_POST['limit']) && empty($_GET['limit'])) {
     $limit = $_GET['limit'];
 }
 
-$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'name';
+$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'id';
 $sortOrder = isset($_GET['order']) ? $_GET['order'] : 'asc';
 $nextSortOrder = ($sortOrder === 'asc') ? 'desc' : 'asc';
 
@@ -26,8 +40,9 @@ $nextSortOrder = ($sortOrder === 'asc') ? 'desc' : 'asc';
 $limit = (int) $limit;
 $offset = ($page - 1) * $limit;
 
+
 $eventObj = new Event();
-$events = $eventObj->pagination('*', 'events', $limit, $offset, $sortColumn, $nextSortOrder);
+$events = $eventObj->pagination('*', 'events', $limit, $offset,$user_id, $sortColumn, $nextSortOrder, $min_capacity, $max_capacity, $searchColumn, $search);
 
 $totalRowCount = $eventObj->index("*", "events")->num_rows;
 $totalPage = ceil($totalRowCount / $limit);
@@ -67,6 +82,7 @@ $totalPage = ceil($totalRowCount / $limit);
         float: right;
     }
 </style>
+<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
 <div class="row">
     <div class="col-md-12 m-auto">
         <div class="card-body">
@@ -74,6 +90,18 @@ $totalPage = ceil($totalRowCount / $limit);
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Event List</h3>
                     <a href="<?php echo $base_url . '/views/event/create.php' ?>" class="btn btn-primary">+ Add New</a>
+                </div>
+                <div class="card-body">
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get">
+                        <input name="search" type="text" placeholder="Search by Name">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                    <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get">
+                        <input name="min_capacity" type="text" placeholder="Min Capacity">
+                        <input name="max_capacity" type="text" placeholder="Max Capacity">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </form>
+
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered table-hover">
@@ -108,13 +136,13 @@ $totalPage = ceil($totalRowCount / $limit);
                                 <tr>
                                     <td><?= $event['name'] ?></td>
                                     <td><?= $event['description'] ?></td>
-                                    <td><?= $event['date'] ?></td>
+                                    <td><?= date('d-m-Y', strtotime($event['date'])) ?></td>
                                     <td><?= $event['capacity'] ?></td>
                                     <td>
-                                        <a href="<?= $base_url . 'views/event/edit.php?id=' . $event['id'] ?>" class="btn btn-primary">Edit</a>
-                                        <a href="<?= $base_url . 'views/event/show.php?id=' . $event['id'] ?>" class="btn btn-primary">Show</a>
-                                        <a href="downloadAttendees.php?event_id=<?= $event['id'] ?>" class="btn btn-success">Download Attendees CSV</a>
-                                        <a href="<?= $base_url . 'views/event/delete.php?id=' . $event['id'] ?>" onclick=" return confirm('Are you sure?')" class="btn btn-danger">Delete</a>
+                                        <a href="<?= $base_url . 'views/event/edit.php?id=' . $event['id'] ?>" class="btn btn-primary btn-sm">Edit</a>
+                                        <a href="<?= $base_url . 'views/event/show.php?id=' . $event['id'] ?>" class="btn btn-info btn-sm">Show</a>
+                                        <a href="downloadAttendees.php?event_id=<?= $event['id'] ?>" class="btn btn-success btn-sm">Download CSV</a>
+                                        <a href="<?= $base_url . 'views/event/delete.php?id=' . $event['id'] ?>" onclick=" return confirm('Are you sure?')" class="btn btn-danger btn-sm">Delete</a>
                                     </td>
                                 </tr>
                             <?php } ?>
