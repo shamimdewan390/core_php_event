@@ -26,10 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user->id;
         $_SESSION['email'] = $user->email;
         header("location: event/index.php");
+        header("Location: " . $base_url . "views/event/index.php");
         exit();
     } else {
         $_SESSION['error'] = "Invalid email or password.";
         header("location: login.php");
+
         exit();
     }
 }

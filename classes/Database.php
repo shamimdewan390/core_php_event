@@ -15,6 +15,11 @@ class Database
         $this->conn = new mysqli($this->host, $this->user, $this->password, $this->dbName);
     }
 
+    public function getConnection()
+    {
+        return $this->conn;
+    }
+
     public function countRows($column, $table, $where = []) {
         $params = [];
         $types = "";
