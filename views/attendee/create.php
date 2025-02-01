@@ -3,9 +3,9 @@ require '../layout/header.php';
 require_once '../../classes/Attendee.php';
 require_once '../../classes/Event.php';
 
-session_start(); // Ensure session is started
+session_start(); 
 
-$errors = []; // Array to store validation errors
+$errors = []; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $post = $_POST;

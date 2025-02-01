@@ -13,7 +13,7 @@ if(!$user_id){
 
 if (isset($_GET['search'])) {
     $search = !empty($_GET['search']) ? trim($_GET['search']) : null;
-    $searchColumn = 'name'; // Define which column to search in
+    $searchColumn = 'name';
 }
 
 // Handle filter form

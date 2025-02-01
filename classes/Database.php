@@ -380,29 +380,4 @@ class Database
             return '';
         }
     }
-    // private function formatData($data) {
-    //     if (!empty($data) && $data !== ["colName" => "value"]) {
-    //         $columnName = array_keys($data);
-    //         $columnValue = array_values($data);
-    //         $colName = '';
-    //         $colValue = '';
-    //         foreach ($columnName as $key => $value) {
-    //             if ($key == count($columnName) - 1) {
-    //                 $colName .= " {$value} ";
-    //                 $colValue .= " '$columnValue[$key]' ";
-    //             } else {
-    //                 $colName .= " {$value}, ";
-    //                 $colValue .=  " '$columnValue[$key]', ";
-    //             }
-    //         }
-    //         $string = "( {$colName} ) VALUES ( {$colValue} )";
-
-    //         return $string;
-    //     } else {
-    //         return '';
-    //     }
-    // }
-
-
-
 }
