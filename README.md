@@ -60,7 +60,7 @@ Now, open `http://localhost:9000/` in your browser.
 
 
 ## 🎯 Bonus Features (Optional Enhancements)
-- **Search functionality** for events and attendees.
+- **Search functionality** for events.
 
 ## 🔎 Evaluation Criteria
 ✔️ **Code Quality**: Well-structured and readable.
