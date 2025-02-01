@@ -1,9 +1,9 @@
 <?php
+session_start();
 require '../layout/header.php';
 require_once '../../classes/Attendee.php';
 require_once '../../classes/Event.php';
 
-session_start();
 
 $user_id = $_SESSION['user_id'];
 

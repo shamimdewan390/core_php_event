@@ -24,9 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['error'] = "Phone number should be 11 digits.";
     }
 
-    // Proceed only if there are no validation errors
     if (empty($_SESSION['error'])) {
-
         $event = $objEvent->find("*", 'events', ['id' => $post['event_id']]);
         $capacity = $event['capacity'];
         $attendeeCount = $objAttendee->countRows('*', 'attendees', ['event_id' => $event['id']]);

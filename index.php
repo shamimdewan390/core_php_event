@@ -87,6 +87,11 @@ $totalPage = ceil($totalRowCount / $limit);
                 </div>
 
                 <div class="card-body">
+                    <?php if (!empty($_SESSION['error'])): ?>
+                        <div class='alert alert-danger'><?= $_SESSION['error']; ?></div>
+                        <?php unset($_SESSION['error']); ?>
+                    <?php endif; ?>
+                    
                     <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get" class="form-inline">
                         <div class="row mb-3">
                             <div class="col">
@@ -102,16 +107,16 @@ $totalPage = ceil($totalRowCount / $limit);
                     <form action="<?= $_SERVER['PHP_SELF'] ?>" method="get" class="form-inline">
                         <div class="row">
                             <div class="col">
-                                <input type="text" name="min_capacity"  class="form-control" placeholder="Min Capacity">
+                                <input type="text" name="min_capacity" class="form-control" placeholder="Min Capacity">
                             </div>
                             <div class="col">
                                 <input type="text" name="max_capacity" class="form-control" placeholder="Max Capacity">
                             </div>
                             <div class="col">
-                            <button type="submit" class="btn btn-primary">Filter</button>
+                                <button type="submit" class="btn btn-primary">Filter</button>
                             </div>
                             <div class="col">
-                            <button type="submit" class="btn btn-primary">clear</button>
+                                <button type="submit" class="btn btn-primary">clear</button>
                             </div>
                         </div>
                     </form>

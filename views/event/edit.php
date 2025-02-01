@@ -1,4 +1,5 @@
 <?php
+session_start();
 require '../layout/header.php';
 require_once '../../classes/Event.php';
 require_once __DIR__ . '/../../config.php';
@@ -22,7 +23,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     $id = $_GET['id'];
     $objEvent = new Event();
-    $event = $objEvent->find("*", 'events', ['id' => $id]);
+    $event = $objEvent->find("*", 'events', ['id' => $id, 'user_id'=> $user_id]);
+    if(!$event){
+        $_SESSION['error'] = "Not authenticated.";
+        header("Location: " . $base_url . "index.php");
+    }
 }
 ?>
 
@@ -53,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div class="form-group">
                             <label for="date">Date</label>
-                            <input type="date" value="<?= $event['date'] ?>" name="date" class="form-control" id="date">
+                            <input type="date" value="<?= date('Y-m-d', strtotime($event['date'])) ?>" name="date" class="form-control" id="date">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
