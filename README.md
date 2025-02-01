@@ -58,14 +58,9 @@ php -S localhost:9000
 ```
 Now, open `http://localhost:9000/` in your browser.
 
-## 📌 Hosting and Deployment
-- The project can be hosted on **Heroku, Vercel, or shared hosting**.
-- Upload the files to the server and configure the database connection.
 
 ## 🎯 Bonus Features (Optional Enhancements)
 - **Search functionality** for events and attendees.
-- **AJAX-powered event registration** for improved user experience.
-- **JSON API Endpoint** to fetch event details programmatically.
 
 ## 🔎 Evaluation Criteria
 ✔️ **Code Quality**: Well-structured and readable.
